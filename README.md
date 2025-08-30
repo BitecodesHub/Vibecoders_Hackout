@@ -167,5 +167,5 @@ We welcome contributions! Please fork the repo, create a feature branch, and sub
 
 ## 📬 Contact
 **Team Vibecoders** – HackOut 2025 Submission  
-📧 Email: your-team-email@example.com  
+📧 Email: jayunadkat777@gmail.com
 🌍 Repo: [Vibecoders_Hackout](https://github.com/BitecodesHub/Vibecoders_Hackout)  
