@@ -80,8 +80,8 @@ class SiteScore(BaseModel):
 class SHAPExplanation(BaseModel):
     site_id: str
     feature_importance: Dict[str, float]
-    top_positive_factors: List[Dict[str, float]]
-    top_negative_factors: List[Dict[str, float]]
+    top_positive_factors: List[Dict[str, Any]]
+    top_negative_factors: List[Dict[str, Any]]
 
 class LCOHResult(BaseModel):
     site_id: str

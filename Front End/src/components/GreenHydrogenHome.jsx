@@ -23,50 +23,12 @@ const GreenHydrogenHome = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Hardcoded AI-recommended sites
-  const hardcodedSites = [
-    {
-      City: "Bhuj",
-      Latitude: 23.242,
-      Longitude: 69.6669,
-      "Solar_Irradiance_kWh/m²/day": 6.1,
-      Temperature_C: 27.8,
-      "Wind_Speed_m/s": 8.1,
-      PV_Power_kW: 2800,
-      Wind_Power_kW: 2100,
-      "Electrolyzer_Efficiency_%": 80,
-      "Hydrogen_Production_kg/day": 485,
-      Desalination_Power_kW: 340,
-      "System_Efficiency_%": 75,
-      Feasibility_Score: 96.5,
-      LCOH: 3.2,
-      ROI: 18.5,
-    },
-    {
-      City: "Rajkot",
-      Latitude: 22.3039,
-      Longitude: 70.8022,
-      "Solar_Irradiance_kWh/m²/day": 5.8,
-      Temperature_C: 28.5,
-      "Wind_Speed_m/s": 7.2,
-      PV_Power_kW: 2500,
-      Wind_Power_kW: 1800,
-      "Electrolyzer_Efficiency_%": 78,
-      "Hydrogen_Production_kg/day": 450,
-      Desalination_Power_kW: 320,
-      "System_Efficiency_%": 72,
-      Feasibility_Score: 94.2,
-      LCOH: 3.8,
-      ROI: 15.2,
-    },
-  ];
-
   useEffect(() => {
     const fetchBackendSites = async () => {
       try {
         setLoading(true);
         const response = await fetch(
-          "https://hackout2025-backend.onrender.com/ml/sites/top"
+          "http://localhost:8080/ml/sites/top"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch sites data");
@@ -84,8 +46,7 @@ const GreenHydrogenHome = () => {
     fetchBackendSites();
   }, []);
 
-  // Combine hardcoded sites with backend sites
-  const allSites = [...hardcodedSites, ...backendSites];
+  const allSites = [...backendSites];
 
   const getScoreColor = (score) => {
     if (score >= 90) return "text-emerald-600 bg-emerald-50";
@@ -226,19 +187,33 @@ const GreenHydrogenHome = () => {
                   Avg Feasibility
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {allSites.length > 0
-                    ? (
-                        allSites.reduce(
-                          (sum, site) => sum + site.Feasibility_Score,
-                          0
-                        ) / allSites.length
-                      ).toFixed(1)
-                    : 0}
+                 {allSites.length > 0
+  ? (
+      allSites.reduce(
+        (sum, site) => sum + site.Feasibility_Score,
+        0
+      ) / allSites.length
+    ).toFixed(2)
+  : 0}
+
                 </p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-600" />
             </div>
           </div>
+          <button
+            onClick={() => navigate("/map")}
+            className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            Explore All Sites
+          </button>
+
+          <button
+            onClick={() => navigate("/stats")}
+            className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            Statistics Dashboard
+          </button>
         </div>
       </div>
 
@@ -290,7 +265,7 @@ const GreenHydrogenHome = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {allSites.map((site, index) => (
+            {allSites.slice(0, 5).map((site, index) => (
               <div key={`${site.City}-${index}`} className="group">
                 <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                   {/* Header */}
@@ -314,13 +289,6 @@ const GreenHydrogenHome = () => {
                           </span>
                         </div>
                       </div>
-                      <div
-                        className={`px-4 py-2 rounded-full text-white font-bold ${getScoreBadgeColor(
-                          site.Feasibility_Score
-                        )}`}
-                      >
-                        {site.Feasibility_Score.toFixed(1)}
-                      </div>
                     </div>
                   </div>
 
@@ -330,7 +298,7 @@ const GreenHydrogenHome = () => {
                     <div className="mb-6">
                       <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <Brain className="h-5 w-5 text-emerald-600 mr-2" />
-                        AI Recommendation Factors
+                        AI Recommendation Factors (Based on 50cr Investment)
                       </h4>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg p-4 border border-emerald-200">
@@ -339,7 +307,7 @@ const GreenHydrogenHome = () => {
                             <div>
                               <p className="text-sm text-gray-600">LCOH</p>
                               <p className="text-xl font-bold text-gray-900">
-                                ${site.LCOH}/kg
+                                ₹{site?.lcoh.toFixed(2)}/kg
                               </p>
                               <p className="text-xs text-emerald-600 font-medium">
                                 Levelized Cost of Hydrogen
@@ -353,7 +321,7 @@ const GreenHydrogenHome = () => {
                             <div>
                               <p className="text-sm text-gray-600">ROI</p>
                               <p className="text-xl font-bold text-gray-900">
-                                {site.ROI}%
+                                {site.roi?.toFixed(2)}%
                               </p>
                               <p className="text-xs text-blue-600 font-medium">
                                 Return on Investment
@@ -391,7 +359,8 @@ const GreenHydrogenHome = () => {
                                 System Efficiency
                               </p>
                               <p className="text-xl font-bold text-gray-900">
-                                {site["System_Efficiency_%"]}%
+                                {Number(site["System_Efficiency_%"]).toFixed(2)}
+                                %
                               </p>
                             </div>
                           </div>
@@ -408,28 +377,32 @@ const GreenHydrogenHome = () => {
                         <MetricCard
                           icon={Sun}
                           label="Solar Irradiance"
-                          value={site["Solar_Irradiance_kWh/m²/day"]}
+                          value={Number(
+                            site["Solar_Irradiance_kWh/m²/day"]
+                          ).toFixed(2)}
                           unit="kWh/m²/day"
                           color="text-yellow-600"
                         />
                         <MetricCard
                           icon={Thermometer}
                           label="Temperature"
-                          value={site.Temperature_C}
+                          value={Number(site["Temperature_C"]).toFixed(2)}
                           unit="°C"
                           color="text-red-500"
                         />
                         <MetricCard
                           icon={Wind}
                           label="Wind Speed"
-                          value={site["Wind_Speed_m/s"]}
+                          value={Number(site["Wind_Speed_m/s"]).toFixed(2)}
                           unit="m/s"
                           color="text-sky-600"
                         />
                         <MetricCard
                           icon={Activity}
                           label="Electrolyzer Eff."
-                          value={site["Electrolyzer_Efficiency_%"]}
+                          value={Number(
+                            site["Electrolyzer_Efficiency_%"]
+                          ).toFixed(2)}
                           unit="%"
                           color="text-indigo-600"
                         />
@@ -487,7 +460,8 @@ const GreenHydrogenHome = () => {
                       >
                         <TrendingUp className="h-5 w-5 mr-2" />
                         AI Feasibility Score:{" "}
-                        {site.Feasibility_Score.toFixed(1)}/100
+                       {site.Feasibility_Score.toFixed(2)}/1
+
                       </div>
                       <p className="text-xs text-gray-500 mt-2">
                         Based on LCOH, ROI, and 12+ environmental factors
